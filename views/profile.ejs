@@ -5,10 +5,8 @@
 
 <img src="<%= user.image %>" alt="User Image" />
 
-<form action="/profile/upload" method="post" enctype="multipart/form-data">
-  <label for="image">Update Profile Image:</label>
+<form action="/profile" method="post" enctype="multipart/form-data">
+  <label for="image">Обновить изображение профиля:</label>
   <input type="file" name="image" id="image" accept="image/*" required />
-  <button type="submit">Upload</button>
-
-  <!-- Добавьте здесь другие поля профиля -->
+  <button type="submit">Загрузить</button>
 </form>

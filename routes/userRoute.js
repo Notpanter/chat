@@ -55,6 +55,10 @@ user_route.get('/logout', auth.isLogin, userController.logout);
 user_route.get('/dashboard', auth.isLogin, userController.loadDashboard)
 user_route.post('/save-chat', userController.saveChat)
 
+user_route.get('/profile', auth.isLogin ,userController.loadProfile);
+user_route.post('/profile', auth.isLogin, upload.single('image'), userController.uploadProfileImage);
+
+
 user_route.get('*', function(req, res){
     res.redirect('/');
 })

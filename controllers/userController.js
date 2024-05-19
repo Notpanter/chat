@@ -107,6 +107,53 @@ const saveChat = async(req, res) => {
     }
 }
 
+const loadProfile = async (req, res) => {
+    try {
+        // Load the user's profile data
+        const user = await User.findById(req.session.user._id);
+
+        // Render the profile view with the user's data
+        res.render('profile', { user: user });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+const uploadProfileImage = async (req, res) => {
+    try {
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).send('No file uploaded');
+        }
+
+        // Get the uploaded file data
+        const imagePath = 'images/'+req.file.filename;
+
+        // Get the user's ID from the session
+        const userId = req.session.user._id;
+
+        // Find the user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Update the user's profile image data
+        user.image = imagePath;
+
+        // Save the updated user object
+        await user.save();
+
+        // Redirect back to the profile page
+        res.redirect('/profile');
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
 module.exports = {
     registerLoad,
     register,
@@ -114,5 +161,7 @@ module.exports = {
     login,
     logout,
     loadDashboard, 
-    saveChat
+    saveChat,
+    loadProfile,
+    uploadProfileImage
 }
