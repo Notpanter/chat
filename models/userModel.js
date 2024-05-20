@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:'user'
     },
+    friends:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    }],
     is_online:{
         type:String,
         default:'0'

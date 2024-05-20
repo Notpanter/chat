@@ -1,26 +1,23 @@
 <div class="row">
     <div class="col-md-4">
       <ul class="list-group">
-        <% if (users.length > 0) { for(let i = 0; i < users.length; i++){ %>
+        <% if (friends.length > 0) { for(let i = 0; i < friends.length; i++){ %>
         <li
           class="list-group-item list-group-item-dark cursor-pointer user-list"
-          data-id="<%= users[i]['_id'] %>"
+          data-id="<%= friends[i]['_id'] %>"
         >
           <img
-            src="<%= 'http://localhost:4000/'+users[i]['image'] %>"
-            alt=""
-            width="50px"
-            height="50px"
-            alt=""
-            width="100px"
-            height="100px"
+            src="data:image/jpeg;base64,<%= friends[i]['image'] %>"
+            alt="User image"
+            width="150px"
+            height="150px"
           />
-          <%= users[i]['name'] %> <% if (users[i]['is_online'] == 1) { %>
-          <sup class="online-status" id="<%= users[i]['_id'] %>-status"
+          <%= friends[i]['name'] %> <% if (friends[i]['is_online'] == 1) { %>
+          <sup class="online-status" id="<%= friends[i]['_id'] %>-status"
             >Online</sup
           >
           <% } else { %>
-          <sup class="offline-status" id="<%= users[i]['_id'] %>-status"
+          <sup class="offline-status" id="<%= friends[i]['_id'] %>-status"
             >Offline</sup
           >
           <% } %>

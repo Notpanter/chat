@@ -1,0 +1,57 @@
+<%- include('layouts/header.ejs') %>
+
+<h2>Hii, admin <%= user.name %></h2>
+<h3>Here all users </h3>
+ 
+
+<table id="usersTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <% for (let i=0; i < users.length; i ++) { %>
+        <tr>
+            <td> <%= users[i]['name'] %> </td>
+            <td> <%= users[i]['email'] %> </td>
+            <td> <%= users[i]['role'] %> </td>
+            <!-- <td> <%= users[i]['name'] %> </td> -->
+            <!-- <td> actions </td> -->
+            <td><button class="editUserBtn" data-user-id="<%= users[i]._id %>">edit</button></td>
+
+            
+        </tr>
+        <% }%>
+    </tbody>
+</table>
+<!-- modal -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit User</h2>
+        <form id="editUserForm", enctype="multipart/form-data"  >
+            <!-- Edit user form fields -->
+            <input type="hidden" id="userId" name="userId">
+            <label for="userName">Name:</label>
+            <input type="text" id="userName" name="name" required><br><br>
+            <label for="userEmail">Email:</label>
+            <input type="email" id="userEmail" name="email" required><br><br>
+            <label for="userRole">Role:</label>
+            <select id="userRole" name="role" required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select><br><br>
+            <button type="submit">Update</button>
+            <button id="deleteUserBtn" type="button">Delete</button>
+        </form>
+    </div>
+</div>
+<script src="js/edit-user.js"></script>
+
+
+<%- include('layouts/footer.ejs') %>

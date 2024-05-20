@@ -1,6 +1,11 @@
 const User = require('../models/userModel');
 const Chat = require('../models/chatModel');
+const Post = require('../models/postModel')
+const FriendRequest = require('../models/friendRequestModel')
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
+// const bcrypt = require('bcrypt');
 
 
 const registerLoad = async(req, res) => {
@@ -14,11 +19,15 @@ const registerLoad = async(req, res) => {
 const register = async(req, res) => {
     try {
         const passwordHash = await bcrypt.hash(req.body.password, 10);
+        
+        const imagePath = req.file.path;
+        const imageBuffer = fs.readFileSync(imagePath);
+        const imageBase64 = imageBuffer.toString('base64');
 
         const user = new User({
             name: req.body.name, 
             email: req.body.email,
-            image: 'images/'+req.file.filename,
+            image: imageBase64,
             password: passwordHash
         });
 
@@ -77,8 +86,11 @@ const logout = async(req, res) =>{
 const loadDashboard = async(req, res) =>{
     try {
         var users = await User.find({ _id: { $nin:[req.session.user._id]}});
+        // for (let i = 0; i < users.length; i ++){
+        //     console.log(users[i]['name'])
+        // }
         res.render('dashboard', {user: req.session.user, users:users})
-}
+    }
         // if(req.session.user) {
         //     res.render('dashboard', {user:req.session.user})
         // } else {
@@ -86,6 +98,17 @@ const loadDashboard = async(req, res) =>{
         //     return res.redirect('/login');
         // }
      catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+const loadAllUsers = async(req, res) =>{
+    try{
+        var users = await User.find({});
+        res.render('admin', {user: req.session.user, users:users})
+    }
+    catch(error){
         console.log(error.message);
     }
 }
@@ -106,62 +129,102 @@ const saveChat = async(req, res) => {
         res.status(400).send({success:false, msg:error.message});
     }
 }
-
-const loadProfile = async (req, res) => {
+// activity
+const loadActivity = async(req, res) =>{
     try {
-        // Load the user's profile data
-        const user = await User.findById(req.session.user._id);
-
-        // Render the profile view with the user's data
-        res.render('profile', { user: user });
+        var posts = await Post.find({});
+        // console.log(posts)
+        res.render('activity', {user: req.session.user, posts:posts})
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Internal Server Error');
+        console.log(error.message);
+    }
+}
+const createPost = async(req, res) => {
+    try {
+        const userId = req.session.user._id; // Assuming user ID is stored in session
+        const post = new Post({
+            user_id: userId,
+            title: req.body.title, 
+            image: 'images/'+req.file.filename,
+            content: req.body.content
+        });
+
+        await post.save();
+        // var posts = await Post.find({});
+        // res.render('activity', {user: req.session.user, posts:posts})
+        res.redirect('activity')
+    } catch (error) {
+       console.log(error.message); 
+    }
+}
+// admin-panel
+const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId);
+        res.json(user);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: 'Server error' });
     }
 }
 
-const uploadProfileImage = async (req, res) => {
+const updateUser = async (req, res) => {
     try {
-        // Check if a file was uploaded
-        if (!req.file) {
-            return res.status(400).send('No file uploaded');
-        }
+        console.log('update ' + req.params.userId)
+        console.log(req.body)
+        await User.findByIdAndUpdate(req.params.userId, req.body);
+        res.status(200).json({ message: 'User updated successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+}
 
-        // Get the uploaded file data
-        const imagePath = 'images/'+req.file.filename;
-
-        // Get the user's ID from the session
+const deleteUser = async (req, res) => {
+    try {
+        console.log('delete ' + req.params.userId)
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+}
+// Friends
+const loadFriends = async (req, res) => {
+    try{
         const userId = req.session.user._id;
-
-        // Find the user by ID
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).send('User not found');
+        //request
+        const friendRequests  = await FriendRequest.find({ requestTo: userId }).populate('requestFrom');
+        console.log(friendRequests)
+        //friends
+        const user = await User.findById(userId).populate('friends');
+        if (!user){
+            return res.status(404).json({ error: 'User not found' });
         }
-
-        // Update the user's profile image data
-        user.image = imagePath;
-
-        // Save the updated user object
-        await user.save();
-
-        // Redirect back to the profile page
-        res.redirect('/profile');
-    } catch (error) {
+        // Extract and send the friends array
+        const friends = user.friends;
+        console.log(friends)
+        res.render('friends', {user: req.session.user, friendRequests:friendRequests, friends:friends})
+    }catch (error) {
         console.error(error.message);
-        res.status(500).send('Internal Server Error');
+        // res.status(500).json({ error: 'Server error' });
     }
+
 }
-
-
 module.exports = {
     registerLoad,
     register,
     loadLogin,
     login,
     logout,
-    loadDashboard, 
-    saveChat,
-    loadProfile,
-    uploadProfileImage
+    loadDashboard,
+    loadActivity,
+    loadAllUsers,
+    createPost,
+    getUserById,
+    updateUser,
+    deleteUser,
+    loadFriends,
+    saveChat
 }

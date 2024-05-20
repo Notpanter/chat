@@ -34,7 +34,7 @@ const storage =  multer.diskStorage({
         cb(null, path.join(__dirname,'../public/images'));
     },
     filename:function(req,file,cb){
-        const name = Date.now()+'-'+file.originalname;
+        const name = Date.now()+path.extname(file.originalname);
         cb(null, name);
     }
 });
@@ -55,8 +55,17 @@ user_route.get('/logout', auth.isLogin, userController.logout);
 user_route.get('/dashboard', auth.isLogin, userController.loadDashboard)
 user_route.post('/save-chat', userController.saveChat)
 
-user_route.get('/profile', auth.isLogin ,userController.loadProfile);
-user_route.post('/profile', auth.isLogin, upload.single('image'), userController.uploadProfileImage);
+
+
+user_route.get('/activity', auth.isLogin, userController.loadActivity)
+user_route.post('/activity', upload.single('image'), userController.createPost)
+
+user_route.get('/admin', auth.isLogin, userController.loadAllUsers)
+user_route.get('/admin/:userId', auth.isLogin, userController.getUserById);
+user_route.post('/admin/update/:userId', auth.isLogin, userController.updateUser);
+user_route.delete('/admin/delete/:userId', auth.isLogin, userController.deleteUser);
+
+user_route.get('/friends', auth.isLogin, userController.loadFriends)
 
 
 user_route.get('*', function(req, res){

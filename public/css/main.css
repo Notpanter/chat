@@ -1,0 +1,6 @@
+@import url(modal.css);
+@import url(navbar.css);
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }

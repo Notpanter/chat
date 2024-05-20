@@ -1,0 +1,60 @@
+<%- include('layouts/header.ejs') %>
+
+<head>
+    <!-- <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <!-- <title>ACtivity</title> -->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+
+
+<h2 class="mb-4">Hii, <%= user.name %></h2>
+<h3 class="mb-4">Here activities </h3>
+
+<% if (user.role == "admin") {%>
+    <button id="openModalBtn">Create Post</button>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create Post</h2>
+            <form id="createPostForm" action="" method="POST", enctype="multipart/form-data">
+                <label for="postTitle">Title:</label>
+                <input type="text" id="postTitle" name="title" required><br><br>
+                <label for="postImage">Image:</label>
+                <input type="file" name="image" required /><br><br>
+                <label for="postContent">Content:</label>
+                <textarea id="postContent" name="content" required></textarea><br><br>
+                <button type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+
+<% } %>
+<div class="col-md-4">
+    <ul class="list-group">
+        <% if (posts.length > 0) { %>
+        <% for(let i = 0; i < posts.length; i++){ %>
+        <li>
+        <%= posts[i]['title'] %> 
+        <img
+            src="<%= 'http://localhost:4000/'+posts[i]['image'] %>"
+            alt=""
+            width="50px"
+            height="50px"
+            alt=""
+            width="100px"
+            height="100px"
+        />
+        <%= posts[i]['content'] %>
+        </li>
+        <% } } %>
+    </ul>
+</div>
+
+<script src="js/create-post.js"></script>
+
+
+
+<%- include('layouts/footer.ejs') %>
